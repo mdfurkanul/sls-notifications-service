@@ -3,19 +3,24 @@ import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 const client = new SESClient({ region: "us-east-1" });
 
 async function sendMail(event, context) {
+  const record = event.Records[0];
+  console.log("SQS record: ", record);
+
+  const email_json = JSON.parse(record.body);
+  const { subject, body, recipient } = email_json;
   const params = {
     Source: "md@furkanul.com",
     Destination: {
-      ToAddresses: ["md@furkanul.com"],
+      ToAddresses: [recipient],
     },
     Message: {
       Body: {
         Text: {
-          Data: "Hello from Codingly!",
+          Data: body,
         },
       },
       Subject: {
-        Data: "Test Mail",
+        Data: subject,
       },
     },
   };
